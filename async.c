@@ -38,9 +38,8 @@ void	ft_putstr_fd(char *s, int fd)
 	write(fd, s, strlen(s));
 }
 
-int	error_print(const char *name, int line)
+int	error_print(const char *name)
 {
-	ft_putnbr_fd(line, 2);
 	ft_putstr_fd(": minishell: ", 2);
 	ft_putstr_fd((char *)name, 2);
 	if (errno == EACCES)
@@ -74,7 +73,7 @@ int	error_print_int(int num)
 
 	str[1] = '\0';
 	str[0] = '0' + num;
-	return (error_print(str, __LINE__));
+	return (error_print(str));
 }
 
 void	close_pipe(int *pipe)
@@ -103,11 +102,12 @@ pid_t	async(char *const *argv, char *const *envp, int is_pipe)
 				close_pipe(rpipe);
 			else
 			{
-				error_print("dup2", __LINE__);
+				error_print("dup2");
 				exit(1);
 			}
 		}
 		execve(argv[0], argv, envp);
+		error_print(argv[0]);
 		exit(1);
 	}
 	if (is_pipe)
@@ -115,7 +115,7 @@ pid_t	async(char *const *argv, char *const *envp, int is_pipe)
 		if (dup2(rpipe[0], STDIN_FILENO) != -1)
 			close_pipe(rpipe);
 		else
-			error_print("dup2", __LINE__);
+			error_print("dup2");
 	}
 	return (pid);
 }
@@ -141,10 +141,7 @@ int	promise(pid_t *pids)
 
 	stats = 1;
 	while (pids && *pids)
-	{
-		printf("exit: %d\n", *pids);
 		stats = await(*pids++);
-	}
 	return (stats);
 }
 
