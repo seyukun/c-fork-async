@@ -84,39 +84,30 @@ void	close_pipe(int *pipe)
 		error_print_int(pipe[1]);
 }
 
-pid_t	async(char *const *argv, char *const *envp, int is_pipe)
+pid_t	async(char *const *argv, char *const *envp, int ispip, int targetpip)
 {
 	pid_t	pid;
 	int		rpipe[2];
 
 	if (argv == NULL || argv[0] == NULL)
 		return (0);
-	if (is_pipe)
+	if (ispip)
 		pipe(rpipe);
 	pid = fork();
 	if (pid == 0)
 	{
-		if (is_pipe)
-		{
-			if (dup2(rpipe[1], STDOUT_FILENO) != -1)
-				close_pipe(rpipe);
-			else
-			{
-				error_print("dup2");
-				exit(1);
-			}
-		}
+		if (ispip && dup2(rpipe[1], STDOUT_FILENO) != -1)
+			close_pipe(rpipe);
+		else if (ispip && error_print("dup2"))
+			exit(1);
 		execve(argv[0], argv, envp);
 		error_print(argv[0]);
 		exit(1);
 	}
-	if (is_pipe)
-	{
-		if (dup2(rpipe[0], STDIN_FILENO) != -1)
-			close_pipe(rpipe);
-		else
-			error_print("dup2");
-	}
+	if (ispip && dup2(rpipe[0], targetpip) != -1)
+		close_pipe(rpipe);
+	else if (ispip)
+		error_print("dup2");
 	return (pid);
 }
 
