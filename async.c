@@ -146,9 +146,9 @@ int	main(void)
 	char *const	cmd3[] = {"/bin/cat", NULL};
 
 	bzero(pids, sizeof(pid_t) * 4);
-	pids[0] = async(cmd1, envp, 1);
-	pids[1] = async(cmd2, envp, 1);
-	pids[2] = async(cmd3, envp, 0);
+	pids[0] = async(cmd1, envp, 1, STDIN_FILENO);
+	pids[1] = async(cmd2, envp, 1, STDIN_FILENO);
+	pids[2] = async(cmd3, envp, 0, STDIN_FILENO);
 	dup2(infd, STDIN_FILENO);
 	promise(pids);
 	return (0);
