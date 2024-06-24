@@ -84,7 +84,7 @@ void	close_pipe(int *pipe)
 		error_print_int(pipe[1]);
 }
 
-pid_t	async(char *const *argv, char *const *envp, int ispip, int targetpip)
+pid_t	async(char *const *argv, char *const *envp, int ispip, int ofd)
 {
 	pid_t	pid;
 	int		rpipe[2];
@@ -104,7 +104,7 @@ pid_t	async(char *const *argv, char *const *envp, int ispip, int targetpip)
 		error_print(argv[0]);
 		exit(1);
 	}
-	if (ispip && dup2(rpipe[0], targetpip) != -1)
+	if (ispip && dup2(rpipe[0], ofd) != -1)
 		close_pipe(rpipe);
 	else if (ispip)
 		error_print("dup2");
